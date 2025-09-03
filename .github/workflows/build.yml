@@ -13,10 +13,10 @@ jobs:
     
     steps:
     - name: 检出代码
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     
     - name: 设置 .NET
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 6.0.x
         
@@ -27,7 +27,7 @@ jobs:
       run: dotnet build "Office 2016 Unlocker.sln" --configuration Release --no-restore
       
     - name: 上传构建产物
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: MSOffice2016Unlocker
         path: |
@@ -41,7 +41,7 @@ jobs:
     
     steps:
     - name: 下载构建产物
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: MSOffice2016Unlocker
         path: release-artifacts
