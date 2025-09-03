@@ -1,0 +1,59 @@
+name: Build MSOffice2016Unlocker
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v3
+    
+    - name: 设置 .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+        
+    - name: 恢复依赖项
+      run: dotnet restore "Office 2016 Unlocker.sln"
+      
+    - name: 构建项目
+      run: dotnet build "Office 2016 Unlocker.sln" --configuration Release --no-restore
+      
+    - name: 上传构建产物
+      uses: actions/upload-artifact@v3
+      with:
+        name: MSOffice2016Unlocker
+        path: |
+          unlocker/bin/Release/net461/unlocker.exe
+          unlocker/bin/Release/net461/unlocker.pdb
+          
+  release:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 下载构建产物
+      uses: actions/download-artifact@v3
+      with:
+        name: MSOffice2016Unlocker
+        path: release-artifacts
+        
+    - name: 创建发布
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: release-artifacts/**
+        name: MSOffice2016Unlocker ${{ github.sha }}
+        tag_name: v${{ github.run_number }}
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
